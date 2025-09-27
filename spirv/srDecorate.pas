@@ -65,13 +65,13 @@ implementation
 
 function TsrHeaderList.emit_glsl_ext:PSpirvOp;
 begin
- if (FGLSL_std_450=nil) then
+ if (FGLSL_std_450 = nil) then
  begin
-  FGLSL_std_450:=AddSpirvOp(Op.OpExtInstImport);
-  FGLSL_std_450^.pDst:=Emit.NewRefNode;
+  FGLSL_std_450 := AddSpirvOp(Op.OpExtInstImport);
+  FGLSL_std_450^.pDst := Emit.NewRefNode;
   FGLSL_std_450^.AddString('GLSL.std.450');
  end;
- Result:=FGLSL_std_450;
+ Result := FGLSL_std_450;
 end;
 
 //
@@ -80,15 +80,15 @@ function TsrDecorate.c(n1,n2:PsrDecorate):Integer;
 var
  i:Byte;
 begin
- //first data
- Result:=Integer(n1^.key.data>n2^.key.data)-Integer(n1^.key.data<n2^.key.data);
- if (Result<>0) then Exit;
+ // First compare data pointers
+ Result := Integer(n1^.key.data > n2^.key.data) - Integer(n1^.key.data < n2^.key.data);
+ if (Result <> 0) then Exit;
 
- //param[i]
- For i:=0 to 2 do
+ // Then compare parameters
+ for i := 0 to 2 do
  begin
-  Result:=Integer(n1^.key.param[i]>n2^.key.param[i])-Integer(n1^.key.param[i]<n2^.key.param[i]);
-  if (Result<>0) then Exit;
+  Result := Integer(n1^.key.param[i] > n2^.key.param[i]) - Integer(n1^.key.param[i] < n2^.key.param[i]);
+  if (Result <> 0) then Exit;
  end;
 end;
 

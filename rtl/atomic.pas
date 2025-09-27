@@ -472,12 +472,18 @@ function test_and_set(var Target:SizeUInt;bit:byte):Boolean; ms_abi_default;
 Var
  P,N,M:SizeUInt;
 begin
- M:=1 shl bit;
+ if bit >= SizeOf(SizeUInt) * 8 then
+ begin
+  Result := False;
+  Exit;
+ end;
+ 
+ M := 1 shl bit;
  repeat
-  P:=load_consume(Target);
-  N:=P or M;
- until CAS(Target,P,N);
- Result:=(P and M)<>0;
+  P := load_consume(Target);
+  N := P or M;
+ until CAS(Target, P, N);
+ Result := (P and M) <> 0;
 end;
 {$ENDIF}
 {$ENDIF}

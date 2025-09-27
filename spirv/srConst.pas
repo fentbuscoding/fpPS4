@@ -186,8 +186,8 @@ end;
 
 function TsrConst.GetItem(i:Word):PsrNode;
 begin
- if (i>fCount) then Exit(nil);
- Result:=pData[i];
+ if (i >= fCount) then Exit(nil);
+ Result := pData[i];
 end;
 
 function TsrConst.GetLiteral(i:Word):PsrLiteral;
@@ -341,9 +341,9 @@ Function TsrConst.isBoolVal:Boolean; inline;
 begin
  if (fCount<>1) then Exit(False);
  Case AsUint64 of
-  0,1:Result:=True;
+  0, 1: Result := True;
   else
-      Result:=False;
+    Result := False;
  end;
 end;
 
@@ -355,27 +355,28 @@ var
 begin
  Result:='';
 
- Case dtype of
+ case dtype of
   dtBool:
     begin
-     Case AsBool of
-      true :Result:='true';
-      False:Result:='false';
+     case AsBool of
+      true:  Result := 'true';
+      false: Result := 'false';
      end;
     end;
 
   dtHalf16:
     begin
-     s:=Single(AsHalf16);
-     i:=0;
-     if TryTruncInt64(s,i) then
+     s := Single(AsHalf16);
+     i := 0;
+     if TryTruncInt64(s, i) then
      begin
-      if (s=i) then
+      if (s = i) then
       begin
-       Case i of
-          0..99:Result:='ch'+IntToStr(i);
-         -9..-1:Result:='chm'+IntToStr(abs(i));
-        else;
+       case i of
+          0..99:  Result := 'ch' + IntToStr(i);
+         -9..-1:  Result := 'chm' + IntToStr(abs(i));
+        else
+         // No action for other values
        end;
       end;
      end;
@@ -383,16 +384,17 @@ begin
 
   dtFloat32:
     begin
-     s:=AsFloat32;
-     i:=0;
-     if TryTruncInt64(s,i) then
+     s := AsFloat32;
+     i := 0;
+     if TryTruncInt64(s, i) then
      begin
-      if (s=i) then
+      if (s = i) then
       begin
-       Case i of
-          0..99:Result:='cf'+IntToStr(i);
-         -9..-1:Result:='cfm'+IntToStr(abs(i));
-        else;
+       case i of
+          0..99:  Result := 'cf' + IntToStr(i);
+         -9..-1:  Result := 'cfm' + IntToStr(abs(i));
+        else
+         // No action for other values
        end;
       end;
      end;
@@ -400,24 +402,27 @@ begin
 
    dtInt32 :
      begin
-      i:=AsInt32;
-      Case i of
-         0..99:Result:='ci'+IntToStr(i);
-        -9..-1:Result:='cim'+IntToStr(abs(i));
-       else;
+      i := AsInt32;
+      case i of
+         0..99:  Result := 'ci' + IntToStr(i);
+        -9..-1:  Result := 'cim' + IntToStr(abs(i));
+       else
+        // No action for other values
       end;
      end;
 
    dtUint32:
      begin
-      ui:=AsUint32;
-      Case ui of
-         0..99:Result:='cu'+IntToStr(ui);
-         else;
+      ui := AsUint32;
+      case ui of
+         0..99: Result := 'cu' + IntToStr(ui);
+         else
+          // No action for other values
       end;
      end;
 
-  else;
+  else
+   // No action for other data types
  end;
 
  if (Result='') then
@@ -750,66 +755,66 @@ end;
 function is_const_ssrc8(SSRC:Byte):Boolean; inline;
 begin
  Case SSRC of
-  128..192,
-  193..208,
-  240..247,
-  255:Result:=True;
+  128..192, 193..208, 240..247, 255:
+    Result := True;
   else
-      Result:=False;
+    Result := False;
  end;
 end;
 
 function is_const_ssrc9(SSRC:Word):Boolean; inline;
 begin
  Case SSRC of
-  128..192,
-  193..208,
-  240..247,
-  255:Result:=True;
+  128..192, 193..208, 240..247, 255:
+    Result := True;
   else
-      Result:=False;
+    Result := False;
  end;
 end;
 
 function CompareConstCount(buf1,buf2:PPsrConst;count:Byte):Boolean;
+var
+ i: Byte;
 begin
- Result:=true;
- While (count<>0) do
+ Result := true;
+ for i := 0 to count - 1 do
  begin
-  Result:=CompareConst(buf1^,buf2^);
+  Result := CompareConst(buf1^, buf2^);
   if not Result then Exit;
   Inc(buf1);
   Inc(buf2);
-  Dec(count);
  end;
 end;
 
 function CompareConst(r1,r2:PsrConst):Boolean;
 begin
- Result:=false;
- if (r1<>nil) and (r2<>nil) then
+ Result := false;
+ if (r1 = nil) or (r2 = nil) then Exit;
+ 
+ Result := (r1 = r2);
+ if Result then Exit;
+ 
+ if not CompareType(r1^.dtype, r2^.dtype) then Exit;
+ if (r1^.fCount <> r2^.fCount) then Exit;
+   
+ if (r1^.fCount = 1) then
  begin
-  Result:=(r1=r2);
-  if Result then Exit;
-  if CompareType(r1^.dtype,r2^.dtype) and (r1^.fCount=r2^.fCount) then
-  begin
-   if (r1^.fCount=1) then
-   begin
-    Result:=(r1^.AsUint64=r2^.AsUint64);
-   end else
-   begin
-    Result:=CompareConstCount(Pointer(r1^.pData),Pointer(r2^.pData),r1^.fCount);
-   end;
-  end;
+  Result := (r1^.AsUint64 = r2^.AsUint64);
+ end else
+ begin
+  Result := CompareConstCount(Pointer(r1^.pData), Pointer(r2^.pData), r1^.fCount);
  end;
 end;
 
-Function TryTruncInt64(c:Single;var i:int64):Boolean;
+Function TryTruncInt64(c:Single; var i:int64):Boolean;
 begin
- Result:=(c>=Low(int64)) and (c<=High(int64));
+ Result := (c >= Low(int64)) and (c <= High(int64)) and not IsNaN(c) and not IsInfinite(c);
  if Result then
  begin
-  i:=Trunc(c);
+  i := Trunc(c);
+ end else
+ begin
+  i := 0;
  end;
 end;
 

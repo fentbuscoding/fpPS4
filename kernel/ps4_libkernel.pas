@@ -1312,10 +1312,10 @@ end;
 
 function ps4_sceSysmoduleUnloadModuleInternal(id:DWord):Integer; SysV_ABI_CDecl;
 begin
- if ((id or $80000000)=$80000000) then Exit(SCE_SYSMODULE_ERROR_INVALID_VALUE);
+ if ((id or $80000000) = $80000000) then Exit(SCE_SYSMODULE_ERROR_INVALID_VALUE);
 
- Writeln(SysLogPrefix,'sceSysmoduleUnloadModuleInternal:',GetSysmoduleInternalName(id));
- Result:=0;
+ Writeln(SysLogPrefix, 'sceSysmoduleUnloadModuleInternal:', GetSysmoduleInternalName(id));
+ Result := 0;
 end;
 
 function ps4_sceSysmoduleUnloadModuleInternalWithArg(id:DWord;

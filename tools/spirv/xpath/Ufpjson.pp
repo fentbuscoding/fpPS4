@@ -250,15 +250,15 @@ Var
  I:SizeInt;
  C,T:AnsiChar;
 begin
- I:=0;
- if Strict then T:='/' else T:=#0;
- While (I<Len) do
+ I := 0;
+ if Strict then T := '/' else T := #0;
+ While (I < Len) do
  begin
-  C:=AnsiChar(P^);
-  if (C in ['"',T,'\',#0..#31]) then
+  C := AnsiChar(P^);
+  if (C in ['"', T, '\', #0..#31]) then
   begin
    FAddStr.AddChar('\');
-   Case C of
+   case C of
      '\',
      '/',
      '"' : FAddStr.AddChar(C);
@@ -270,7 +270,7 @@ begin
    else
     begin
      FAddStr.AddChar('u');
-     FAddStr.AddStr(HexStr(Ord(C),4));
+     FAddStr.AddStr(HexStr(Ord(C), 4));
     end;
    end;
   end else
@@ -307,28 +307,28 @@ Var
 begin
  State:=0;
  I:=0;
- While (I<Len) do
+ While (I < Len) do
  begin
-  Case State of
+  case State of
    0:begin
-      if (P^='\') then
+      if (P^ = '\') then
       begin
-       State:=1;
+       State := 1;
       end else
       begin
        FAddStr.AddChar(P^);
       end;
      end;
    1:begin
-      Case P^ of
-       'b':FAddStr.AddChar(#8);
-       't':FAddStr.AddChar(#9);
-       'n':FAddStr.AddChar(#10);
-       'f':FAddStr.AddChar(#12);
-       'r':FAddStr.AddChar(#13);
-       'u':begin
-            State:=2;
-            w:=0;
+      case P^ of
+       'b': FAddStr.AddChar(#8);
+       't': FAddStr.AddChar(#9);
+       'n': FAddStr.AddChar(#10);
+       'f': FAddStr.AddChar(#12);
+       'r': FAddStr.AddChar(#13);
+       'u': begin
+            State := 2;
+            w := 0;
             Inc(I);
             Inc(P);
             Continue;
@@ -336,18 +336,18 @@ begin
        else
            FAddStr.AddChar(P^);
       end;
-      State:=0;
+      State := 0;
      end;
    2..5:
      begin
-      Case P^ of
-       '0'..'9':w:=(w shl 4) or (PByte(P)^ and $F);
-       'a'..'f':w:=(w shl 4) or (PByte(P)^-DifLo);
-       'A'..'F':w:=(w shl 4) or (PByte(P)^-DifHi);
-       else     w:=(w shl 4);
+      case P^ of
+       '0'..'9': w := (w shl 4) or (PByte(P)^ and $F);
+       'a'..'f': w := (w shl 4) or (PByte(P)^ - DifLo);
+       'A'..'F': w := (w shl 4) or (PByte(P)^ - DifHi);
+       else      w := (w shl 4);
       end;
       Inc(State);
-      if (State=6) then
+      if (State = 6) then
       begin
        FAddStr.AddWideChar(WideChar(W));
        State:=0;

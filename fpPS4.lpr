@@ -128,46 +128,49 @@ begin
   Exit(False);
  end;
 
- n:=-1;
- For i:=1 to ParamCount do
+ n := -1;
+ For i := 1 to ParamCount do
  begin
   case LowerCase(ParamStr(i)) of
-      '-e':n:=0;
-      '-f':n:=1;
-      '-p':n:=2;
-      '-s':n:=3;
-      '-h':n:=4;
-      '-w':ps4_libSceVideoOut.FULLSCREEN_MODE:=True;
-    '-pad':n:=5;
-    '-led':n:=6;
+      '-e': n := 0;
+      '-f': n := 1;
+      '-p': n := 2;
+      '-s': n := 3;
+      '-h': n := 4;
+      '-w': ps4_libSceVideoOut.FULLSCREEN_MODE := True;
+    '-pad': n := 5;
+    '-led': n := 6;
    else
-     if (n<>-1) then
+     if (n <> -1) then
      begin
-      Case n of
-       0:begin
-          if (ps4_app.app0_file<>'') then Goto promo;
-          ps4_app.app0_file:=Trim(ParamStr(i));
-          if (ps4_app.app0_path='') then
+      case n of
+       0: begin
+          if (ps4_app.app0_file <> '') then Goto promo;
+          ps4_app.app0_file := Trim(ParamStr(i));
+          if (ps4_app.app0_path = '') then
           begin
-           ps4_app.app0_path:=ExtractFileDir(ps4_app.app0_file);
-           if (ExcludeLeadingPathDelimiter(ps4_app.app0_path)='') then ps4_app.app0_path:=GetCurrentDir;
+           ps4_app.app0_path := ExtractFileDir(ps4_app.app0_file);
+           if (ExcludeLeadingPathDelimiter(ps4_app.app0_path) = '') then 
+             ps4_app.app0_path := GetCurrentDir;
           end;
          end;
-       1:begin
-          ps4_app.app0_path:=Trim(ParamStr(i));
-          if (ExcludeLeadingPathDelimiter(ps4_app.app0_path)='') then ps4_app.app0_path:=GetCurrentDir;
+       1: begin
+          ps4_app.app0_path := Trim(ParamStr(i));
+          if (ExcludeLeadingPathDelimiter(ps4_app.app0_path) = '') then 
+            ps4_app.app0_path := GetCurrentDir;
          end;
-       2:begin
-          ps4_app.app1_path:=Trim(ParamStr(i));
-          if (ExcludeLeadingPathDelimiter(ps4_app.app1_path)='') then ps4_app.app1_path:=GetCurrentDir;
+       2: begin
+          ps4_app.app1_path := Trim(ParamStr(i));
+          if (ExcludeLeadingPathDelimiter(ps4_app.app1_path) = '') then 
+            ps4_app.app1_path := GetCurrentDir;
          end;
-       3:begin
-          ps4_app.save_path:=Trim(ParamStr(i));
+       3: begin
+          ps4_app.save_path := Trim(ParamStr(i));
          end;
-       5:begin
+       5: begin
           select_pad_interface(Trim(ParamStr(i)));
          end;
-       6:begin
+       6: begin
           select_led_color(Trim(ParamStr(i)));
          end;
        4:begin
@@ -189,31 +192,31 @@ begin
   end;
  end;
 
- if (ps4_app.app0_file='') or (ps4_app.app0_path='') or (ps4_app.save_path='') then Goto promo;
+ if (ps4_app.app0_file = '') or (ps4_app.app0_path = '') or (ps4_app.save_path = '') then Goto promo;
 
- if (ps4_app.app1_path=ps4_app.app0_path) then
+ if (ps4_app.app1_path = ps4_app.app0_path) then
  begin
-  ps4_app.app1_path:='';
+  ps4_app.app1_path := '';
  end;
 
  if not FileExists(ps4_app.app0_file) then
  begin
-  Writeln(StdErr,'File not found:',ps4_app.app0_file);
+  Writeln(StdErr, 'File not found: ', ps4_app.app0_file);
   Writeln;
   Goto promo;
  end;
 
  if not DirectoryExists(ps4_app.app0_path) then
  begin
-  Writeln(StdErr,'Path not found:',ps4_app.app0_path);
+  Writeln(StdErr, 'Path not found: ', ps4_app.app0_path);
   Writeln;
   Goto promo;
  end;
 
- if (ps4_app.app1_path<>'') then
+ if (ps4_app.app1_path <> '') then
  if not DirectoryExists(ps4_app.app1_path) then
  begin
-  Writeln(StdErr,'Path not found:',ps4_app.app1_path);
+  Writeln(StdErr, 'Path not found: ', ps4_app.app1_path);
   Writeln;
   Goto promo;
  end;
@@ -436,70 +439,66 @@ var
 
 procedure LoadProgram;
 var
- elf:Telf_file;
- f:RawByteString;
+ elf: Telf_file;
+ f: RawByteString;
 begin
- elf:=nil;
+ elf := nil;
 
- if (ps4_app.app1_path<>'') then
+ if (ps4_app.app1_path <> '') then
  begin
-  //first try patch
-  f:='';
-  if (parse_filename('/app1/eboot.bin',f)=PT_FILE) then
+  // First try patch
+  f := '';
+  if (parse_filename('/app1/eboot.bin', f) = PT_FILE) then
   begin
-   elf:=Telf_file(LoadPs4ElfFromFile(f));
+   elf := Telf_file(LoadPs4ElfFromFile(f));
   end;
  end;
 
- if (elf=nil) then
+ if (elf = nil) then
  begin
-  //second try app0_file
-  elf:=Telf_file(LoadPs4ElfFromFile(ps4_app.app0_file));
+  // Second try app0_file
+  elf := Telf_file(LoadPs4ElfFromFile(ps4_app.app0_file));
  end;
 
- Assert(elf<>nil,'program not loaded!');
-
- ps4_app.prog:=elf;
+ Assert(elf <> nil, 'program not loaded!');
+ ps4_app.prog := elf;
 end;
 
 begin
- DefaultSystemCodePage:=CP_UTF8;
- DefaultUnicodeCodePage:=CP_UTF8;
- DefaultFileSystemCodePage:=CP_UTF8;
- DefaultRTLFileSystemCodePage:=CP_UTF8;
- UTF8CompareLocale:=CP_UTF8;
+ DefaultSystemCodePage := CP_UTF8;
+ DefaultUnicodeCodePage := CP_UTF8;
+ DefaultFileSystemCodePage := CP_UTF8;
+ DefaultRTLFileSystemCodePage := CP_UTF8;
+ UTF8CompareLocale := CP_UTF8;
 
  sys_crt_init;
 
  if not cpu.AVX2Support then
  begin
-  Writeln(StdErr,'AVX2 not support!');
-  Assert(false,'AVX2 not supported!');
+  Writeln(StdErr, 'AVX2 not supported!');
+  Assert(false, 'AVX2 not supported!');
   Exit;
  end;
 
- ps4_app.save_path:=IncludeTrailingPathDelimiter(GetCurrentDir)+'savedata';
+ ps4_app.save_path := IncludeTrailingPathDelimiter(GetCurrentDir) + 'savedata';
  if not ParseCmd then Exit;
 
- ps4_app.resolve_cb:=@ResolveImport;
- ps4_app.reload_cb :=@ReloadImport;
+ ps4_app.resolve_cb := @ResolveImport;
+ ps4_app.reload_cb  := @ReloadImport;
 
  LoadProgram;
  ps4_app.prog.Prepare;
 
- ps4_app.RegistredElf    (ps4_app.prog);
- ps4_app.ResolveDepended (ps4_app.prog);
+ ps4_app.RegistredElf(ps4_app.prog);
+ ps4_app.ResolveDepended(ps4_app.prog);
  ps4_app.LoadSymbolImport(nil);
-
 
  Stub.FinStub;
  ps4_app.InitProt;
 
- _pthread_run_entry(@main,GetSceUserMainThreadName,GetSceUserMainThreadStackSize);
+ _pthread_run_entry(@main, GetSceUserMainThreadName, GetSceUserMainThreadStackSize);
 
  ps4_libSceVideoOut.App_Run;
- //KillALLThreads TODO
- //readln;
 end.
 
 
