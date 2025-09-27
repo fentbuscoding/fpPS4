@@ -192,31 +192,31 @@ begin
   end;
  end;
 
- if (ps4_app.app0_file='') or (ps4_app.app0_path='') or (ps4_app.save_path='') then Goto promo;
+ if (ps4_app.app0_file = '') or (ps4_app.app0_path = '') or (ps4_app.save_path = '') then Goto promo;
 
- if (ps4_app.app1_path=ps4_app.app0_path) then
+ if (ps4_app.app1_path = ps4_app.app0_path) then
  begin
-  ps4_app.app1_path:='';
+  ps4_app.app1_path := '';
  end;
 
  if not FileExists(ps4_app.app0_file) then
  begin
-  Writeln(StdErr,'File not found:',ps4_app.app0_file);
+  Writeln(StdErr, 'File not found: ', ps4_app.app0_file);
   Writeln;
   Goto promo;
  end;
 
  if not DirectoryExists(ps4_app.app0_path) then
  begin
-  Writeln(StdErr,'Path not found:',ps4_app.app0_path);
+  Writeln(StdErr, 'Path not found: ', ps4_app.app0_path);
   Writeln;
   Goto promo;
  end;
 
- if (ps4_app.app1_path<>'') then
+ if (ps4_app.app1_path <> '') then
  if not DirectoryExists(ps4_app.app1_path) then
  begin
-  Writeln(StdErr,'Path not found:',ps4_app.app1_path);
+  Writeln(StdErr, 'Path not found: ', ps4_app.app1_path);
   Writeln;
   Goto promo;
  end;
@@ -439,70 +439,66 @@ var
 
 procedure LoadProgram;
 var
- elf:Telf_file;
- f:RawByteString;
+ elf: Telf_file;
+ f: RawByteString;
 begin
- elf:=nil;
+ elf := nil;
 
- if (ps4_app.app1_path<>'') then
+ if (ps4_app.app1_path <> '') then
  begin
-  //first try patch
-  f:='';
-  if (parse_filename('/app1/eboot.bin',f)=PT_FILE) then
+  // First try patch
+  f := '';
+  if (parse_filename('/app1/eboot.bin', f) = PT_FILE) then
   begin
-   elf:=Telf_file(LoadPs4ElfFromFile(f));
+   elf := Telf_file(LoadPs4ElfFromFile(f));
   end;
  end;
 
- if (elf=nil) then
+ if (elf = nil) then
  begin
-  //second try app0_file
-  elf:=Telf_file(LoadPs4ElfFromFile(ps4_app.app0_file));
+  // Second try app0_file
+  elf := Telf_file(LoadPs4ElfFromFile(ps4_app.app0_file));
  end;
 
- Assert(elf<>nil,'program not loaded!');
-
- ps4_app.prog:=elf;
+ Assert(elf <> nil, 'program not loaded!');
+ ps4_app.prog := elf;
 end;
 
 begin
- DefaultSystemCodePage:=CP_UTF8;
- DefaultUnicodeCodePage:=CP_UTF8;
- DefaultFileSystemCodePage:=CP_UTF8;
- DefaultRTLFileSystemCodePage:=CP_UTF8;
- UTF8CompareLocale:=CP_UTF8;
+ DefaultSystemCodePage := CP_UTF8;
+ DefaultUnicodeCodePage := CP_UTF8;
+ DefaultFileSystemCodePage := CP_UTF8;
+ DefaultRTLFileSystemCodePage := CP_UTF8;
+ UTF8CompareLocale := CP_UTF8;
 
  sys_crt_init;
 
  if not cpu.AVX2Support then
  begin
-  Writeln(StdErr,'AVX2 not support!');
-  Assert(false,'AVX2 not supported!');
+  Writeln(StdErr, 'AVX2 not supported!');
+  Assert(false, 'AVX2 not supported!');
   Exit;
  end;
 
- ps4_app.save_path:=IncludeTrailingPathDelimiter(GetCurrentDir)+'savedata';
+ ps4_app.save_path := IncludeTrailingPathDelimiter(GetCurrentDir) + 'savedata';
  if not ParseCmd then Exit;
 
- ps4_app.resolve_cb:=@ResolveImport;
- ps4_app.reload_cb :=@ReloadImport;
+ ps4_app.resolve_cb := @ResolveImport;
+ ps4_app.reload_cb  := @ReloadImport;
 
  LoadProgram;
  ps4_app.prog.Prepare;
 
- ps4_app.RegistredElf    (ps4_app.prog);
- ps4_app.ResolveDepended (ps4_app.prog);
+ ps4_app.RegistredElf(ps4_app.prog);
+ ps4_app.ResolveDepended(ps4_app.prog);
  ps4_app.LoadSymbolImport(nil);
-
 
  Stub.FinStub;
  ps4_app.InitProt;
 
- _pthread_run_entry(@main,GetSceUserMainThreadName,GetSceUserMainThreadStackSize);
+ _pthread_run_entry(@main, GetSceUserMainThreadName, GetSceUserMainThreadStackSize);
 
  ps4_libSceVideoOut.App_Run;
- //KillALLThreads TODO
- //readln;
 end.
 
 

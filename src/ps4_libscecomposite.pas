@@ -51,15 +51,15 @@ var
 
  g_index_bits:DWORD=0;
 
-function alloc_dmem(var mem:TMemInfo;len:QWORD;prot:Byte):Integer;
+function alloc_dmem(var mem:TMemInfo; len:QWORD; prot:Byte):Integer;
 begin
- Result:=ps4_sceKernelAllocateMainDirectMemory(len,0,SCE_KERNEL_WB_ONION,@mem.offset);
- if (Result<>0) then Exit;
+ Result := ps4_sceKernelAllocateMainDirectMemory(len, 0, SCE_KERNEL_WB_ONION, @mem.offset);
+ if (Result <> 0) then Exit;
 
- Result:=ps4_sceKernelMapDirectMemory(@mem.addr,len,prot,0,mem.offset,0);
- if (Result<>0) then Exit;
+ Result := ps4_sceKernelMapDirectMemory(@mem.addr, len, prot, 0, mem.offset, 0);
+ if (Result <> 0) then Exit;
 
- mem.size:=len;
+ mem.size := len;
 end;
 
 function ps4_sceCompositorInitWithProcessOrder(sharedSystemMemorySize:DWORD;
