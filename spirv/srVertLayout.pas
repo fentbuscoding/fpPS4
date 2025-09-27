@@ -62,33 +62,33 @@ end;
 
 function TsrVertLayout.c(n1,n2:PsrVertLayout):Integer;
 begin
- Result:=Integer(n1^.pLayout>n2^.pLayout)-Integer(n1^.pLayout<n2^.pLayout);
+ Result := Integer(n1^.pLayout > n2^.pLayout) - Integer(n1^.pLayout < n2^.pLayout);
 end;
 
 procedure TsrVertLayout.Init(p:PsrDataLayout); inline;
 begin
- fntype  :=ntVertLayout;
- FStorage:=StorageClass.Input;
- FBinding:=-1;
- pLayout :=p;
+ fntype   := ntVertLayout;
+ FStorage := StorageClass.Input;
+ FBinding := -1;
+ pLayout  := p;
 end;
 
 function TsrVertLayout.GetString:RawByteString;
 var
  PID:DWORD;
 begin
- PID:=0;
- if (pLayout<>nil) then
+ PID := 0;
+ if (pLayout <> nil) then
  begin
-  PID:=pLayout^.FID;
+  PID := pLayout^.FID;
  end;
- Result:='VA;PID='+HexStr(PID,8)+
-           ';BND='+HexStr(FBinding,8);
+ Result := 'VA;PID=' + HexStr(PID, 8) +
+           ';BND=' + HexStr(FBinding, 8);
 end;
 
 function TsrVertLayout.GetStorageName:RawByteString;
 begin
- Result:='atParam'+IntToStr(FBinding);
+ Result := 'atParam' + IntToStr(FBinding);
 end;
 
 procedure TsrVertLayoutList.Init(Emit:TCustomEmit); inline;

@@ -128,46 +128,49 @@ begin
   Exit(False);
  end;
 
- n:=-1;
- For i:=1 to ParamCount do
+ n := -1;
+ For i := 1 to ParamCount do
  begin
   case LowerCase(ParamStr(i)) of
-      '-e':n:=0;
-      '-f':n:=1;
-      '-p':n:=2;
-      '-s':n:=3;
-      '-h':n:=4;
-      '-w':ps4_libSceVideoOut.FULLSCREEN_MODE:=True;
-    '-pad':n:=5;
-    '-led':n:=6;
+      '-e': n := 0;
+      '-f': n := 1;
+      '-p': n := 2;
+      '-s': n := 3;
+      '-h': n := 4;
+      '-w': ps4_libSceVideoOut.FULLSCREEN_MODE := True;
+    '-pad': n := 5;
+    '-led': n := 6;
    else
-     if (n<>-1) then
+     if (n <> -1) then
      begin
-      Case n of
-       0:begin
-          if (ps4_app.app0_file<>'') then Goto promo;
-          ps4_app.app0_file:=Trim(ParamStr(i));
-          if (ps4_app.app0_path='') then
+      case n of
+       0: begin
+          if (ps4_app.app0_file <> '') then Goto promo;
+          ps4_app.app0_file := Trim(ParamStr(i));
+          if (ps4_app.app0_path = '') then
           begin
-           ps4_app.app0_path:=ExtractFileDir(ps4_app.app0_file);
-           if (ExcludeLeadingPathDelimiter(ps4_app.app0_path)='') then ps4_app.app0_path:=GetCurrentDir;
+           ps4_app.app0_path := ExtractFileDir(ps4_app.app0_file);
+           if (ExcludeLeadingPathDelimiter(ps4_app.app0_path) = '') then 
+             ps4_app.app0_path := GetCurrentDir;
           end;
          end;
-       1:begin
-          ps4_app.app0_path:=Trim(ParamStr(i));
-          if (ExcludeLeadingPathDelimiter(ps4_app.app0_path)='') then ps4_app.app0_path:=GetCurrentDir;
+       1: begin
+          ps4_app.app0_path := Trim(ParamStr(i));
+          if (ExcludeLeadingPathDelimiter(ps4_app.app0_path) = '') then 
+            ps4_app.app0_path := GetCurrentDir;
          end;
-       2:begin
-          ps4_app.app1_path:=Trim(ParamStr(i));
-          if (ExcludeLeadingPathDelimiter(ps4_app.app1_path)='') then ps4_app.app1_path:=GetCurrentDir;
+       2: begin
+          ps4_app.app1_path := Trim(ParamStr(i));
+          if (ExcludeLeadingPathDelimiter(ps4_app.app1_path) = '') then 
+            ps4_app.app1_path := GetCurrentDir;
          end;
-       3:begin
-          ps4_app.save_path:=Trim(ParamStr(i));
+       3: begin
+          ps4_app.save_path := Trim(ParamStr(i));
          end;
-       5:begin
+       5: begin
           select_pad_interface(Trim(ParamStr(i)));
          end;
-       6:begin
+       6: begin
           select_led_color(Trim(ParamStr(i)));
          end;
        4:begin
